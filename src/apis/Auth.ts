@@ -1,6 +1,6 @@
 import { api } from ".";
-import { SigninBody } from "../types/auth/SignInBody";
-import { SignupBody } from "../types/auth/SignupBody";
+import { SigninBody } from "../interface/auth/sign-in-body";
+import { SignupBody } from "../interface/auth/sign-up-body";
 
 export const signin = (body: SigninBody) => {
   return api.post("/auth/signin", body);
