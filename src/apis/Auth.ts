@@ -1,15 +1,13 @@
 import { api } from ".";
+import { SigninBody } from "../types/auth/SignInBody";
+import { SignupBody } from "../types/auth/SignupBody";
 
-export const signin = (data: { email: string; password: string }) => {
-  return api.post("/auth/signin", data);
+export const signin = (body: SigninBody) => {
+  return api.post("/auth/signin", body);
 };
 
-export const signup = (data: {
-  name: string;
-  email: string;
-  password: string;
-}) => {
-  return api.post("/auth/signup", data);
+export const signup = (body: SignupBody) => {
+  return api.post("/auth/signup", body);
 };
 
 export const getMyInfo = () => {
