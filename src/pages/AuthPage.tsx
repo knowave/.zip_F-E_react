@@ -4,6 +4,9 @@ export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,9 +18,6 @@ export default function AuthPage() {
     } else {
       setEmailError("");
     }
-
-    // 여기에 회원가입 API 호출 로직 추가
-    console.log("회원가입 또는 로그인 요청");
   };
 
   return (
@@ -62,8 +62,53 @@ export default function AuthPage() {
         <input
           type="password"
           placeholder="비밀번호"
+          value={password}
+          onChange={(e) => {
+            const value = e.target.value;
+            setPassword(value);
+
+            const passwordRegex =
+              /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{5,20}$/;
+
+            if (!passwordRegex.test(value)) {
+              setPasswordError(
+                "❌ 비밀번호는 5~20자, 숫자 및 특수문자(!@#$%^&*)를 최소 1개 포함해야 합니다"
+              );
+            } else if (
+              isSignup &&
+              confirmPassword &&
+              confirmPassword !== value
+            ) {
+              setPasswordError("❌ 비밀번호가 일치하지 않습니다");
+            } else {
+              setPasswordError("");
+            }
+          }}
           className="w-full border rounded-lg px-3 py-2 text-sm"
         />
+
+        {isSignup && (
+          <input
+            type="password"
+            placeholder="비밀번호 확인"
+            value={confirmPassword}
+            onChange={(e) => {
+              const value = e.target.value;
+              setConfirmPassword(value);
+
+              if (password && password !== value) {
+                setPasswordError("❌ 비밀번호가 일치하지 않습니다");
+              } else {
+                setPasswordError("");
+              }
+            }}
+            className="w-full border rounded-lg px-3 py-2 text-sm"
+          />
+        )}
+
+        {passwordError && (
+          <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+        )}
 
         <button
           type="submit"
@@ -76,7 +121,7 @@ export default function AuthPage() {
           className="text-sm text-center text-gray-500 cursor-pointer hover:underline"
           onClick={() => {
             setIsSignup(!isSignup);
-            setEmailError(""); // 탭 전환 시 에러 초기화
+            setEmailError("");
           }}
         >
           {isSignup
