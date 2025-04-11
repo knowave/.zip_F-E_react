@@ -22,7 +22,7 @@ function App() {
             <Route path="/sign/*" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/apartments" element={<ApartmentListPage />} />
-            <Route path="/apartments/:id" element={<ApartmentDetailPage />} />
+            <Route path="/apartment" element={<ApartmentDetailPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

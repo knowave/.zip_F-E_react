@@ -1,4 +1,4 @@
-export type SigninResponse = {
+export interface SigninResponse {
   accessToken: string;
   refreshToken: string;
-};
+}

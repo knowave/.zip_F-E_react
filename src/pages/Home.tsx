@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApartmentViewTopThree } from "../apis/Apartment";
-import { TopThreeApartmentResponse } from "../types/top-three-apartment-res";
+import { TopThreeApartmentResponse } from "../interface/response/top-three-apartment-res";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -15,7 +15,6 @@ export default function Home() {
       const topThreeApartments: TopThreeApartmentResponse[] =
         res.data.apartmentList;
 
-      console.log(topThreeApartments);
       setApartments(topThreeApartments);
     } catch (error) {
       console.error(error);
@@ -48,7 +47,9 @@ export default function Home() {
             <div
               key={i}
               className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition"
-              onClick={() => navigate(`/apartments/${apartment.id}`)}
+              onClick={() =>
+                navigate("/apartment", { state: { id: apartment.id } })
+              }
             >
               <h3 className="font-semibold text-lg">
                 {apartment.announcementName}

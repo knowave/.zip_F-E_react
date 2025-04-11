@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { checkEmail } from "../apis/User";
 import { signin, signup } from "../apis/Auth";
-import { SigninResponse } from "../types/signin-res";
+import { SigninResponse } from "../interface/response/signin-res";
 
 export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
