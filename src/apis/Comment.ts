@@ -1,9 +1,15 @@
 import { api } from ".";
+import { CreateApartmentCommentBody } from "../interface/request/comment/create-apartment-comment-body";
 
 export const createApartmentComment = (
   apartmentId: string,
-  userId: string,
-  body
+  body: CreateApartmentCommentBody
 ) => {
-  return api.post(`comment/${apartmentId}`);
+  const accessToken = localStorage.getItem("accessToken");
+
+  return api.post(`comment/${apartmentId}`, body, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };

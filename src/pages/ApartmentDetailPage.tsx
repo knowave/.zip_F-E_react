@@ -1,17 +1,17 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ApartmentResponse } from "../interface/response/apartment-res";
 import { useEffect, useState } from "react";
 import { getApartmentDetail } from "../apis/Apartment";
+import { createApartmentComment } from "../apis/Comment";
+import { ApartmentDetailResponse } from "../interface/response/apartment-detail";
 
 export default function ApartmentDetailPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  const [getApartment, setGetApartment] = useState<ApartmentResponse>();
+  const [getApartment, setGetApartment] = useState<ApartmentDetailResponse>();
   const [getApartmentError, setGetApartmentError] = useState("");
 
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState<string[]>([]); // 임시 댓글 리스트
 
   useEffect(() => {
     if (!state?.id) {
@@ -19,25 +19,38 @@ export default function ApartmentDetailPage() {
       return;
     }
 
-    const fetchApartment = async () => {
-      try {
-        const res = await getApartmentDetail(state.id);
-        setGetApartment(res.data);
-      } catch (error) {
-        console.error(error);
-        setGetApartmentError("아파트 정보를 불러오는데 실패했습니다.");
-      }
-    };
-
-    fetchApartment();
+    fetchApartmentDetail(state.id);
   }, [state, navigate]);
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const fetchApartmentDetail = async (id: string) => {
+    try {
+      const res = await getApartmentDetail(id);
+
+      const apartmentDetail: ApartmentDetailResponse = res.data;
+      setGetApartment(apartmentDetail);
+    } catch (error) {
+      console.error(error);
+      setGetApartmentError("아파트 정보를 불러오는데 실패했습니다.");
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
-    setComments((prev) => [...prev, comment.trim()]);
-    setComment("");
+    try {
+      await createApartmentComment(state.id, {
+        content: comment.trim(),
+        isPrivate: false,
+        type: "APT",
+      });
+
+      setComment("");
+      await fetchApartmentDetail(state.id); // 댓글 포함 데이터 다시 조회
+    } catch (error) {
+      console.error(error);
+      setGetApartmentError("댓글을 작성하는데 실패했습니다.");
+    }
   };
 
   return (
@@ -79,17 +92,22 @@ export default function ApartmentDetailPage() {
             </form>
 
             <ul className="space-y-4">
-              {comments.length === 0 && (
+              {getApartment.comments?.length === 0 && (
                 <li className="text-gray-400 text-sm">
                   등록된 댓글이 없습니다.
                 </li>
               )}
-              {comments.map((c, idx) => (
+              {getApartment.comments?.map((c) => (
                 <li
-                  key={idx}
+                  key={c.id}
                   className="bg-gray-50 border rounded-lg px-4 py-3"
                 >
-                  <p className="text-sm text-gray-800">익명 사용자 · "{c}"</p>
+                  <p className="text-sm text-gray-800">
+                    {c.username} · "{c.content}"
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {new Date(c.username).toLocaleString()}
+                  </p>
                 </li>
               ))}
             </ul>
