@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { checkEmail } from "../apis/User";
+import { signin, signup } from "../apis/Auth";
+import { SigninResponse } from "../types/signin-res";
+
 export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
@@ -77,11 +80,20 @@ export default function AuthPage() {
         imageUrl,
       };
 
-      // TODO: 회원가입 API 요청
-      console.log("회원가입 요청", payload);
+      await signup(payload);
+      setIsSignup(false);
     } else {
-      // TODO: 로그인 API 요청
-      console.log("로그인 요청", { email, password });
+      const res = await signin({ email, password });
+
+      const accessToken: SigninResponse["accessToken"] = res.data.accessToken;
+      const refreshToken: SigninResponse["refreshToken"] =
+        res.data.refreshToken;
+
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        window.location.href = "/";
+      }
     }
   };
 
@@ -152,8 +164,8 @@ export default function AuthPage() {
 
               if (isSignup) {
                 try {
-                  const isDuplicate = await checkEmail({ email: value });
-                  if (isDuplicate) {
+                  const isPossible = await checkEmail({ email: value });
+                  if (!isPossible) {
                     setEmailError("❌ 이미 사용 중인 이메일입니다");
                   } else {
                     setEmailError("");
