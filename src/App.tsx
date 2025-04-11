@@ -24,7 +24,7 @@ function App() {
         <main className="flex-1 bg-gray-50 px-4 py-6 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/auth/*" element={<AuthPage />} />
+            <Route path="/sign/*" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/apartments" element={<ApartmentListPage />} />
             <Route path="/apartments/:id" element={<ApartmentDetailPage />} />
