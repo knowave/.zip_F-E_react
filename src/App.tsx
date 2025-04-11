@@ -1,11 +1,6 @@
 import React from "react";
 import "tailwindcss/tailwind.css";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  // Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
