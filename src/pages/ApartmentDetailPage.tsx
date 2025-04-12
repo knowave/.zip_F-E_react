@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getApartmentDetail } from "../apis/Apartment";
 import { createApartmentComment } from "../apis/Comment";
-import { ApartmentDetailResponse } from "../interface/response/apartment-detail";
+import { ApartmentDetailResponse } from "../interface/response/apartment/apartment-detail";
 
 export default function ApartmentDetailPage() {
   const { state } = useLocation();

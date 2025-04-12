@@ -1,22 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { checkPassword } from "../apis/User"; // 비밀번호 검증 API
+import { checkPassword, fetchUserEmail } from "../apis/User";
+import { FetchUserEmailResponse } from "../interface/response/user/fetch-user-email-res";
 
 export default function ProfilePage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [user, setUser] = useState<FetchUserEmailResponse | null>(null);
+  const [emailError, setEmailError] = useState("");
   const navigate = useNavigate();
 
   const handlePasswordCheck = async () => {
     try {
-      await checkPassword({ password }); // API 내부에서 accessToken으로 유저 식별
-
+      await checkPassword({ password });
       navigate("/profile/edit");
     } catch (err) {
       console.error(err);
       setError("❌ 비밀번호가 일치하지 않습니다.");
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetchUserEmail();
+        setUser(res.data);
+      } catch (err) {
+        console.error(err);
+        setEmailError("❌ 이메일 정보를 불러오는 데 실패했습니다.");
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <div className="max-w-xl mx-auto py-12">
@@ -29,10 +45,13 @@ export default function ProfilePage() {
           </label>
           <input
             type="email"
-            defaultValue="user@example.com"
+            defaultValue={user?.email ?? ""}
             disabled
             className="w-full border rounded-lg px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
           />
+          {emailError && (
+            <p className="text-sm text-red-500 mt-1">{emailError}</p>
+          )}
         </div>
 
         <div>

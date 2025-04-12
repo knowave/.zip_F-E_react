@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApartmentViewTopThree } from "../apis/Apartment";
-import { TopThreeApartmentResponse } from "../interface/response/top-three-apartment-res";
+import { TopThreeApartmentResponse } from "../interface/response/apartment/top-three-apartment-res";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
