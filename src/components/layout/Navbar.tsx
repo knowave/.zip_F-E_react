@@ -66,9 +66,9 @@ export default function Navbar() {
             onChange={(e) => setTheme(e.target.value as any)}
             className="ml-4 border px-2 py-1 text-sm rounded-md bg-white dark:bg-gray-700 dark:text-white"
           >
-            <option value="light">☀️ 라이트</option>
-            <option value="dark">🌙 다크</option>
-            <option value="system">🖥 시스템</option>
+            <option value="light">☀️ Light</option>
+            <option value="dark">🌙 Dark</option>
+            <option value="system">🖥 System</option>
           </select>
         </nav>
       </div>
