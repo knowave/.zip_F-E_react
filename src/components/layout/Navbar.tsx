@@ -21,7 +21,7 @@ export default function Navbar() {
             내 프로필
           </Link>
           <Link
-            to="/auth/signin"
+            to="/account/signin"
             className="bg-black text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-gray-800"
           >
             로그인
