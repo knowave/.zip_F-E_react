@@ -60,7 +60,6 @@ export default function Navbar() {
             </Link>
           )}
 
-          {/* 🌗 테마 토글 버튼 */}
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value as any)}

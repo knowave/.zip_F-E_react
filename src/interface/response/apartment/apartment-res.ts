@@ -1,4 +1,5 @@
 export interface ApartmentResponse {
+  id?: string;
   contractPeriod: string;
   contractPeriodAnnouncementDate?: Date;
   contractPeriodExpiredDate?: Date;

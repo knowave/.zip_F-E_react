@@ -16,7 +16,6 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        {/* <div className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white font-sans"> */}
         <div className="min-h-screen flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white font-sans transition-colors duration-500">
           <Navbar />
 
