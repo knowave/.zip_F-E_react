@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getApartmentDetail } from "../apis/Apartment";
+import {
+  getApartmentDetail,
+  incrementApartmentViewCount,
+} from "../apis/Apartment";
 import { createApartmentComment } from "../apis/Comment";
 import { ApartmentDetailResponse } from "../interface/response/apartment/apartment-detail";
 import { formatDistanceToNow } from "date-fns";
@@ -45,6 +48,7 @@ export default function ApartmentDetailPage() {
     setLikedComments(commentLikedMap);
 
     fetchApartmentDetail(state.id);
+    incrementApartmentViewCount(state.id);
   }, [state, navigate]);
 
   const fetchApartmentDetail = async (id: string) => {
