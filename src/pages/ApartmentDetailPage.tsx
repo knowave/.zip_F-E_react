@@ -18,7 +18,7 @@ export default function ApartmentDetailPage() {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [isAptLiked, setIsAptLiked] = useState(false);
 
   useEffect(() => {
     if (!state?.id) {
@@ -28,7 +28,7 @@ export default function ApartmentDetailPage() {
     const liked = localStorage.getItem(`liked-apartment-${state.id}`);
 
     if (liked !== null) {
-      setIsLiked(JSON.parse(liked));
+      setIsAptLiked(JSON.parse(liked));
     }
 
     fetchApartmentDetail(state.id);
@@ -74,7 +74,7 @@ export default function ApartmentDetailPage() {
     try {
       const { data: isLike } = await apartmentLike(state.id);
 
-      setIsLiked(isLike);
+      setIsAptLiked(isLike);
       localStorage.setItem(
         `liked-apartment-${state.id}`,
         JSON.stringify(isLike)
@@ -109,7 +109,7 @@ export default function ApartmentDetailPage() {
               onClick={handleLikeToggle}
               className="ml-4 text-red-500 hover:text-red-600"
             >
-              {isLiked ? "♥" : "♡"} {fetchApartment.likeCount}
+              {isAptLiked ? "♥" : "♡"} {fetchApartment.likeCount}
             </button>
           </p>
 
