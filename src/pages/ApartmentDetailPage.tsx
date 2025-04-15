@@ -14,6 +14,7 @@ export default function ApartmentDetailPage() {
   const [getApartmentError, setGetApartmentError] = useState("");
 
   const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!state?.id) {
@@ -27,7 +28,6 @@ export default function ApartmentDetailPage() {
   const fetchApartmentDetail = async (id: string) => {
     try {
       const res = await getApartmentDetail(id);
-
       const apartmentDetail: ApartmentDetailResponse = res.data;
       setGetApartment(apartmentDetail);
     } catch (error) {
@@ -38,9 +38,11 @@ export default function ApartmentDetailPage() {
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    if (!comment.trim() || isSubmitting) return;
 
     try {
+      setIsSubmitting(true);
+
       await createApartmentComment(state.id, {
         content: comment.trim(),
         isPrivate: false,
@@ -48,10 +50,12 @@ export default function ApartmentDetailPage() {
       });
 
       setComment("");
-      await fetchApartmentDetail(state.id); // 댓글 포함 데이터 다시 조회
+      await fetchApartmentDetail(state.id);
     } catch (error) {
       console.error(error);
       setGetApartmentError("댓글을 작성하는데 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -87,13 +91,14 @@ export default function ApartmentDetailPage() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    handleCommentSubmit(e);
+                    e.currentTarget.form?.requestSubmit();
                   }
                 }}
               />
               <button
                 type="submit"
-                className="mt-2 px-4 py-2 bg-black text-white text-sm rounded-xl hover:bg-gray-800"
+                disabled={isSubmitting}
+                className="mt-2 px-4 py-2 bg-black text-white text-sm rounded-xl hover:bg-gray-800 disabled:opacity-50"
               >
                 등록
               </button>
