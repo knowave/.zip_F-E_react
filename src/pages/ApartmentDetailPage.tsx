@@ -5,21 +5,30 @@ import { createApartmentComment } from "../apis/Comment";
 import { ApartmentDetailResponse } from "../interface/response/apartment/apartment-detail";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
+import { apartmentLike } from "../apis/Like";
 
 export default function ApartmentDetailPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
-  const [getApartment, setGetApartment] = useState<ApartmentDetailResponse>();
-  const [getApartmentError, setGetApartmentError] = useState("");
+  const [fetchApartment, setFetchApartment] =
+    useState<ApartmentDetailResponse>();
+  const [fetchApartmentError, setFetchApartmentError] = useState("");
 
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     if (!state?.id) {
       navigate("/", { replace: true });
       return;
+    }
+    const liked = localStorage.getItem(`liked-apartment-${state.id}`);
+
+    if (liked !== null) {
+      setIsLiked(JSON.parse(liked));
     }
 
     fetchApartmentDetail(state.id);
@@ -29,10 +38,10 @@ export default function ApartmentDetailPage() {
     try {
       const res = await getApartmentDetail(id);
       const apartmentDetail: ApartmentDetailResponse = res.data;
-      setGetApartment(apartmentDetail);
+      setFetchApartment(apartmentDetail);
     } catch (error) {
       console.error(error);
-      setGetApartmentError("아파트 정보를 불러오는데 실패했습니다.");
+      setFetchApartmentError("아파트 정보를 불러오는데 실패했습니다.");
     }
   };
 
@@ -53,9 +62,27 @@ export default function ApartmentDetailPage() {
       await fetchApartmentDetail(state.id);
     } catch (error) {
       console.error(error);
-      setGetApartmentError("댓글을 작성하는데 실패했습니다.");
+      setFetchApartmentError("댓글을 작성하는데 실패했습니다.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    if (!fetchApartment) return;
+
+    try {
+      const { data: isLike } = await apartmentLike(state.id);
+
+      setIsLiked(isLike);
+      localStorage.setItem(
+        `liked-apartment-${state.id}`,
+        JSON.stringify(isLike)
+      );
+      await fetchApartmentDetail(state.id);
+    } catch (error) {
+      console.error(error);
+      setFetchApartmentError("❌ 좋아요를 누르는데 실패했습니다.");
     }
   };
 
@@ -63,20 +90,27 @@ export default function ApartmentDetailPage() {
     <div className="max-w-3xl mx-auto py-10">
       <h1 className="text-2xl font-bold mb-4">아파트 상세 정보</h1>
 
-      {getApartmentError && (
-        <p className="text-red-500 text-sm mb-4">{getApartmentError}</p>
+      {fetchApartmentError && (
+        <p className="text-red-500 text-sm mb-4">{fetchApartmentError}</p>
       )}
 
-      {getApartment && (
+      {fetchApartment && (
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-xl font-semibold">
-            {getApartment.announcementName}
+            {fetchApartment.announcementName}
           </h2>
           <p className="text-gray-600 mt-1">
-            {getApartment.businessDistrict} · {getApartment.totalHouseholds}세대
+            {fetchApartment.businessDistrict} · {fetchApartment.totalHouseholds}
+            세대
           </p>
-          <p className="text-sm text-gray-400 mt-2">
-            조회수: {getApartment.viewCount}회 · ❤ {getApartment.likeCount}명
+          <p className="text-sm text-gray-400 mt-2 flex items-center">
+            조회수: {fetchApartment.viewCount}회
+            <button
+              onClick={handleLikeToggle}
+              className="ml-4 text-red-500 hover:text-red-600"
+            >
+              {isLiked ? "♥" : "♡"} {fetchApartment.likeCount}
+            </button>
           </p>
 
           <div className="mt-6">
@@ -105,12 +139,12 @@ export default function ApartmentDetailPage() {
             </form>
 
             <ul className="space-y-4">
-              {getApartment.comments?.length === 0 && (
+              {fetchApartment.comments?.length === 0 && (
                 <li className="text-gray-400 text-sm">
                   등록된 댓글이 없습니다.
                 </li>
               )}
-              {getApartment.comments?.map((c) => (
+              {fetchApartment.comments?.map((c) => (
                 <li
                   key={c.id}
                   className="bg-gray-50 border rounded-lg px-4 py-3"
