@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { getApartmentDetail } from "../apis/Apartment";
 import { createApartmentComment } from "../apis/Comment";
 import { ApartmentDetailResponse } from "../interface/response/apartment/apartment-detail";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 
 export default function ApartmentDetailPage() {
   const { state } = useLocation();
@@ -82,6 +84,12 @@ export default function ApartmentDetailPage() {
                 placeholder="댓글을 입력하세요"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleCommentSubmit(e);
+                  }
+                }}
               />
               <button
                 type="submit"
@@ -106,7 +114,10 @@ export default function ApartmentDetailPage() {
                     {c.username} · "{c.content}"
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    {new Date(c.username).toLocaleString()}
+                    {formatDistanceToNow(new Date(c.createdAt), {
+                      addSuffix: true,
+                      locale: ko,
+                    })}
                   </p>
                 </li>
               ))}

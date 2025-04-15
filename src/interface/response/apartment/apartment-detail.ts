@@ -4,6 +4,7 @@ interface CommentByApartmentResponse {
   isPrivate: boolean;
   likeCount: number;
   username: string;
+  createdAt: Date;
 }
 
 export interface ApartmentDetailResponse {
