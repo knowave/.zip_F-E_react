@@ -143,9 +143,7 @@ export default function ApartmentListPage() {
             <div
               key={apt.id}
               className="bg-white border rounded-xl p-5 cursor-pointer hover:shadow-md transition"
-              onClick={() =>
-                navigate("/apartment-detail", { state: { id: apt.id } })
-              }
+              onClick={() => navigate("/apartment", { state: { id: apt.id } })}
             >
               <h3 className="text-lg font-semibold">{apt.announcementName}</h3>
               <p className="text-sm text-gray-600">
