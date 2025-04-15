@@ -2,6 +2,7 @@ import { useState } from "react";
 import { checkEmail } from "../apis/User";
 import { signin, signup } from "../apis/Auth";
 import { SigninResponse } from "../interface/response/auth/signin-res";
+import { uploadImage } from "../apis/Upload";
 
 export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
@@ -17,23 +18,6 @@ export default function AuthPage() {
   const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
   const passwordRegex =
     /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{5,20}$/;
-
-  const uploadImageToS3 = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error("이미지 업로드 실패");
-    }
-
-    const data = await res.json();
-    return data.imageUrl;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +48,11 @@ export default function AuthPage() {
 
       if (imageFile) {
         try {
-          imageUrl = await uploadImageToS3(imageFile);
+          const formData = new FormData();
+          formData.append("image", imageFile);
+
+          const { data } = await uploadImage(formData);
+          imageUrl = data.url;
         } catch (err) {
           console.error(err);
           alert("이미지 업로드 중 오류가 발생했습니다.");
