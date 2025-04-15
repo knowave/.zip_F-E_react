@@ -5,7 +5,7 @@ import { createApartmentComment } from "../apis/Comment";
 import { ApartmentDetailResponse } from "../interface/response/apartment/apartment-detail";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { apartmentLike } from "../apis/Like";
+import { apartmentLike, commentLike } from "../apis/Like";
 
 export default function ApartmentDetailPage() {
   const { state } = useLocation();
@@ -19,17 +19,30 @@ export default function ApartmentDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isAptLiked, setIsAptLiked] = useState(false);
+  const [likedComments, setLikedComments] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     if (!state?.id) {
       navigate("/", { replace: true });
       return;
     }
-    const liked = localStorage.getItem(`liked-apartment-${state.id}`);
 
-    if (liked !== null) {
-      setIsAptLiked(JSON.parse(liked));
-    }
+    const aptLiked = localStorage.getItem(`liked-apartment-${state.id}`);
+    if (aptLiked !== null) setIsAptLiked(JSON.parse(aptLiked));
+
+    const commentLikedMap: Record<string, boolean> = {};
+    const keys = Object.keys(localStorage);
+    keys.forEach((key) => {
+      if (key.startsWith("liked-comment-")) {
+        const commentId = key.replace("liked-comment-", "");
+        const isLiked = JSON.parse(localStorage.getItem(key) ?? "false");
+        commentLikedMap[commentId] = isLiked;
+      }
+    });
+
+    setLikedComments(commentLikedMap);
 
     fetchApartmentDetail(state.id);
   }, [state, navigate]);
@@ -68,7 +81,7 @@ export default function ApartmentDetailPage() {
     }
   };
 
-  const handleLikeToggle = async () => {
+  const handleAptLikeToggle = async () => {
     if (!fetchApartment) return;
 
     try {
@@ -83,6 +96,26 @@ export default function ApartmentDetailPage() {
     } catch (error) {
       console.error(error);
       setFetchApartmentError("❌ 좋아요를 누르는데 실패했습니다.");
+    }
+  };
+
+  const handleCommentLikeToggle = async (commentId: string) => {
+    try {
+      const { data: isLike } = await commentLike(commentId);
+
+      setLikedComments((prev) => ({
+        ...prev,
+        [commentId]: isLike,
+      }));
+
+      localStorage.setItem(
+        `liked-comment-${commentId}`,
+        JSON.stringify(isLike)
+      );
+
+      await fetchApartmentDetail(state.id);
+    } catch (error) {
+      console.error("❌ 댓글 좋아요 실패", error);
     }
   };
 
@@ -106,7 +139,7 @@ export default function ApartmentDetailPage() {
           <p className="text-sm text-gray-400 mt-2 flex items-center">
             조회수: {fetchApartment.viewCount}회
             <button
-              onClick={handleLikeToggle}
+              onClick={handleAptLikeToggle}
               className="ml-4 text-red-500 hover:text-red-600"
             >
               {isAptLiked ? "♥" : "♡"} {fetchApartment.likeCount}
@@ -152,12 +185,20 @@ export default function ApartmentDetailPage() {
                   <p className="text-sm text-gray-800">
                     {c.username} · "{c.content}"
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {formatDistanceToNow(new Date(c.createdAt), {
-                      addSuffix: true,
-                      locale: ko,
-                    })}
-                  </p>
+                  <div className="text-xs text-gray-400 mt-1 flex items-center justify-between">
+                    <span>
+                      {formatDistanceToNow(new Date(c.createdAt), {
+                        addSuffix: true,
+                        locale: ko,
+                      })}
+                    </span>
+                    <button
+                      onClick={() => handleCommentLikeToggle(c.id)}
+                      className="text-red-500 hover:text-red-600 text-sm ml-2"
+                    >
+                      {likedComments[c.id] ? "♥" : "♡"} {c.likeCount}
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

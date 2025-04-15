@@ -9,3 +9,11 @@ export const apartmentLike = (id: string) => {
     },
   });
 };
+
+export const commentLike = (id: string) => {
+  return api.post(`/like/comment/${id}`, null, {
+    headers: {
+      Authorization: token,
+    },
+  });
+};
