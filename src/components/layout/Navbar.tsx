@@ -16,6 +16,11 @@ export default function Navbar() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
+  const filledKeywords = Array.from({ length: 10 }).map(
+    (_, i) => popularKeywords[i]?.keyword ?? "-"
+  );
+  const currentKeywordText = filledKeywords[currentKeyword];
+
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     setIsLoggedIn(!!token);
@@ -36,13 +41,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (isHovering || popularKeywords.length <= 1) {
+    if (isHovering || popularKeywords.length === 0) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
     intervalRef.current = setInterval(() => {
-      setCurrentKeywordIndex((prev) => (prev + 1) % popularKeywords.length);
+      setCurrentKeywordIndex((prev) => (prev + 1) % 10);
     }, 2000);
 
     return () => {
@@ -72,15 +77,26 @@ export default function Navbar() {
           onMouseLeave={() => setIsHovering(false)}
         >
           🔥 인기 검색어:{" "}
-          <span className="font-semibold transition-opacity duration-300 ease-in-out">
-            {currentKeyword + 1}위 {popularKeywords[currentKeyword]?.keyword}
-          </span>
+          <div className="inline-block ml-2 relative h-6 overflow-hidden align-middle">
+            <div
+              className="transition-transform duration-500 ease-in-out"
+              style={{
+                transform: `translateY(-${currentKeyword * 24}px)`, // 한 줄 높이 기준
+              }}
+            >
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div key={index} className="h-6 leading-6 font-semibold">
+                  {index + 1}위 {filledKeywords[index]}
+                </div>
+              ))}
+            </div>
+          </div>
           {isHovering && (
             <div className="absolute left-0 top-6 mt-2 w-60 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-md shadow-lg z-50 p-3 space-y-1">
-              {popularKeywords.map((item, index) => (
-                <div key={item.keyword} className="flex justify-between">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div key={index} className="flex justify-between text-sm">
                   <span className="font-medium">{index + 1}위</span>
-                  <span>{item.keyword}</span>
+                  <span>{filledKeywords[index]}</span>
                 </div>
               ))}
             </div>
