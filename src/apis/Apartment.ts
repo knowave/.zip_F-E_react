@@ -32,3 +32,7 @@ export const incrementApartmentViewCount = (id: string) => {
 export const saveApartmentKeyword = (body: SaveApartmentKeywordRequest) => {
   return api.post("/apartment/popular-search-keyword", body);
 };
+
+export const fetchApartmentPopularSearchKeyword = () => {
+  return api.get("/apartment/popular-search-keyword");
+};

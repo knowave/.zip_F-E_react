@@ -1,17 +1,54 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { fetchApartmentPopularSearchKeyword } from "../../apis/Apartment";
+import { PopularKeywordResponse } from "../../interface/response/apartment/popular-keyword";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [isHovering, setIsHovering] = useState(false);
+  const [currentKeyword, setCurrentKeywordIndex] = useState(0);
+  const [popularKeywords, setPopularKeywords] = useState<
+    PopularKeywordResponse[]
+  >([]);
 
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     setIsLoggedIn(!!token);
   }, []);
+
+  useEffect(() => {
+    const fetchKeywords = async () => {
+      try {
+        const res = await fetchApartmentPopularSearchKeyword();
+        const data = await res.data;
+        setPopularKeywords(data);
+      } catch (err) {
+        console.error("인기 검색어 불러오기 실패", err);
+      }
+    };
+
+    fetchKeywords();
+  }, []);
+
+  useEffect(() => {
+    if (isHovering || popularKeywords.length <= 1) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+
+    intervalRef.current = setInterval(() => {
+      setCurrentKeywordIndex((prev) => (prev + 1) % popularKeywords.length);
+    }, 2000);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isHovering, popularKeywords]);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -29,6 +66,26 @@ export default function Navbar() {
         >
           Dotzip
         </Link>
+        <div
+          className="relative text-sm text-gray-600 dark:text-gray-300 cursor-pointer"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          🔥 인기 검색어:{" "}
+          <span className="font-semibold transition-opacity duration-300 ease-in-out">
+            {currentKeyword + 1}위 {popularKeywords[currentKeyword]?.keyword}
+          </span>
+          {isHovering && (
+            <div className="absolute left-0 top-6 mt-2 w-60 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-md shadow-lg z-50 p-3 space-y-1">
+              {popularKeywords.map((item, index) => (
+                <div key={item.keyword} className="flex justify-between">
+                  <span className="font-medium">{index + 1}위</span>
+                  <span>{item.keyword}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <nav className="space-x-4 flex items-center">
           <Link
             to="/apartments"
