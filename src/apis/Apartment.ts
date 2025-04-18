@@ -1,5 +1,6 @@
 import { api } from ".";
 import { FetchApartmentQuery } from "../interface/request/apartment/fetch-apartment-query";
+import { SaveApartmentKeywordRequest } from "../interface/request/apartment/save-apartment-keyword";
 
 const token = `Bearer ${localStorage.getItem("accessToken")}`;
 
@@ -26,4 +27,8 @@ export const incrementApartmentViewCount = (id: string) => {
       Authorization: token,
     },
   });
+};
+
+export const saveApartmentKeyword = (body: SaveApartmentKeywordRequest) => {
+  return api.post("/apartment/popular-search-keyword", body);
 };

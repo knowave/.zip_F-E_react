@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchApartments } from "../apis/Apartment";
+import { fetchApartments, saveApartmentKeyword } from "../apis/Apartment";
 import { ApartmentResponse } from "../interface/response/apartment/apartment-res";
 import { FetchApartmentQuery } from "../interface/request/apartment/fetch-apartment-query";
 
@@ -54,7 +54,11 @@ export default function ApartmentListPage() {
     load();
   }, [query]);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    if (searchInput) {
+      await saveApartmentKeyword({ keyword: searchInput });
+    }
+
     setQuery({
       page: 1,
       take: query.take,
