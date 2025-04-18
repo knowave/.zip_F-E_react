@@ -19,7 +19,6 @@ export default function Navbar() {
   const filledKeywords = Array.from({ length: 10 }).map(
     (_, i) => popularKeywords[i]?.keyword ?? "-"
   );
-  const currentKeywordText = filledKeywords[currentKeyword];
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
