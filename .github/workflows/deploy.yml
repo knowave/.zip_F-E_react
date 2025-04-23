@@ -23,28 +23,28 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
                   aws-region: ${{ env.AWS_REGION }}
 
-            # - name: Set up Node.js
-            #   uses: actions/setup-node@v3
-            #   with:
-            #       node-version: 20
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20
 
-            # - name: Install dependencies
-            #   run: |
-            #       npm i -g yarn
-            #       yarn install
+            - name: Install dependencies
+              run: |
+                  npm i -g yarn
+                  yarn install
 
-            # - name: Build React App
-            #   run: yarn build
+            - name: Build React App
+              run: yarn build
 
             - name: Upload to S3
               run: |
                   echo "${{ env.AWS_S3_BUCKET }}"
-                #   aws s3 sync ./build s3://${{ env.AWS_S3_BUCKET }} \
-                #   --region ${{ env.AWS_REGION }} \
-                #   --delete
+                  aws s3 sync ./build s3://${{ env.AWS_S3_BUCKET }} \
+                  --region ${{ env.AWS_REGION }} \
+                  --delete
 
-            # - name: Invalidate CloudFront
-            #   run: |
-            #       aws cloudfront create-invalidation \
-            #       --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
-            #       --paths "/*"
+            - name: Invalidate CloudFront
+              run: |
+                  aws cloudfront create-invalidation \
+                  --distribution-id ${{ secrets.DISTRIBUTION_ID }} \
+                  --paths "/*"
