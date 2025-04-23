@@ -45,7 +45,6 @@ jobs:
                   echo "${{ env.AWS_S3_BUCKET }}"
                   aws s3 sync ./build s3://${{ env.AWS_S3_BUCKET }} \
                   --region ${{ env.AWS_REGION }} \
-                  --acl public-read \
                   --delete
 
             - name: Invalidate CloudFront
