@@ -23,6 +23,10 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
                   aws-region: ${{ env.AWS_REGION }}
 
+            - name: Generate .env
+              run: |
+                  echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
