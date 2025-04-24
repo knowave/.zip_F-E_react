@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IsJwtExpired } from '../utils/is-jwt-expired';
 
-export const BASE_URL = process.env.BASE_URL;
+export const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export const api = axios.create({
     baseURL: BASE_URL,
